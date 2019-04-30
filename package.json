@@ -8,9 +8,9 @@
       "ios"
     ]
   },
-  "description": "This Cordova plugin provides JavaScript API, that allows you to communicate with server through TCP protocol. Currently we support these platforms: iOS, Android.",
-  "repository": "https://github.com/blocshop/sockets-for-cordova.git",
-  "issue": "https://github.com/blocshop/sockets-for-cordova/issues",
+  "description": "This Cordova plugin provides a JavaScript API which allows direct communication with a server via TCP. Supports these platforms: iOS, Android.",
+  "repository": "https://github.com/chill117/sockets-for-cordova.git",
+  "issue": "https://github.com/chill117/sockets-for-cordova/issues",
   "keywords": [
     "sockets",
     "tcp",
