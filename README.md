@@ -2,7 +2,7 @@ sockets-for-cordova
 ===================
 This Cordova plugin provides JavaScript API, that allows you to communicate with server through TCP protocol.
 
-Currently we support these platforms: iOS, Android, WP8.
+Currently we support these platforms: iOS, Android.
 
 You can also get information about this plugin from our blog post http://www.blocshop.cz/2015/01/12/tcp-networking-in-cordova/
 
