@@ -196,18 +196,4 @@ var guid = (function () {
     };
 })();
 
-// Register event dispatcher for Windows Phone
-if (navigator.userAgent.match(/iemobile/i)) {
-    window.document.addEventListener("deviceready", function () {
-        exec(
-            Socket.dispatchEvent,
-            function (errorMessage) {
-                console.error("SocketsForCordova: Cannot register WP event dispatcher, Error: " + errorMessage);
-            },
-            CORDOVA_SERVICE_NAME,
-            "registerWPEventDispatcher",
-            [ ]);
-    });
-}
-
 module.exports = Socket;
