@@ -35,7 +35,19 @@ function Socket() {
     this.socketKey = guid();
 }
 
-Socket.prototype.open = function (host, port, success, error) {
+Socket.prototype.open = function (host, port, timeout, success, error) {
+
+    // The timeout parameter is optional.
+    // If it isn't used, then shift the last args to the left.
+    if (typeof timeout === 'function') {
+        error = success;
+        success = timeout;
+        timeout = null;
+    }
+
+    if (typeof timeout !== 'number') {
+        timeout = 30000;
+    }
 
     success = success || function() { };
     error = error || function() { };
@@ -86,7 +98,7 @@ Socket.prototype.open = function (host, port, success, error) {
         },
         CORDOVA_SERVICE_NAME,
         "open",
-        [ this.socketKey, host, port ]);
+        [ this.socketKey, host, port, timeout ]);
 };
 
 Socket.prototype.write = function (data, success, error) {

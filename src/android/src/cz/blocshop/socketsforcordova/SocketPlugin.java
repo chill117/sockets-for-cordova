@@ -47,8 +47,6 @@ public class SocketPlugin extends CordovaPlugin {
 			this.shutdownWrite(args, callbackContext);
 		} else if (action.equals("close")) {
 			this.close(args, callbackContext);
-		} else if (action.equals("setOptions")) {
-			this.setOptions(args, callbackContext);
 		} else {
 			callbackContext.error(String.format("SocketPlugin - invalid action:", action));
 			return false;
@@ -60,29 +58,25 @@ public class SocketPlugin extends CordovaPlugin {
 		String socketKey = args.getString(0);
 		String host = args.getString(1);
 		int port = args.getInt(2);
-		
+		int timeout = args.getInt(3);
 		SocketAdapter socketAdapter = new SocketAdapterImpl();
 		socketAdapter.setCloseEventHandler(new CloseEventHandler(socketKey));
 		socketAdapter.setDataConsumer(new DataConsumer(socketKey));
 		socketAdapter.setErrorEventHandler(new ErrorEventHandler(socketKey));
 		socketAdapter.setOpenErrorEventHandler(new OpenErrorEventHandler(callbackContext));
 		socketAdapter.setOpenEventHandler(new OpenEventHandler(socketKey, socketAdapter, callbackContext));
-		
-		socketAdapter.open(host, port);
+		socketAdapter.open(host, port, timeout);
 	}
 	
 	private void write(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-		String socketKey = args.getString(0);
-		JSONArray data = args.getJSONArray(1);
-		
-		byte[] dataBuffer = new byte[data.length()];
-		for(int i = 0; i < dataBuffer.length; i++) {
-			dataBuffer[i] = (byte) data.getInt(i);
-		}
-		
-		SocketAdapter socket = this.getSocketAdapter(socketKey);
-		
 		try {
+			String socketKey = args.getString(0);
+			JSONArray data = args.getJSONArray(1);
+			byte[] dataBuffer = new byte[data.length()];
+			for(int i = 0; i < dataBuffer.length; i++) {
+				dataBuffer[i] = (byte) data.getInt(i);
+			}
+			SocketAdapter socket = this.getSocketAdapter(socketKey);
 			socket.write(dataBuffer);
 			callbackContext.success();
 		} catch (IOException e) {
@@ -91,11 +85,9 @@ public class SocketPlugin extends CordovaPlugin {
 	}
 
 	private void shutdownWrite(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-		String socketKey = args.getString(0);
-		
-		SocketAdapter socket = this.getSocketAdapter(socketKey);
-		
 		try {
+			String socketKey = args.getString(0);
+			SocketAdapter socket = this.getSocketAdapter(socketKey);
 			socket.shutdownWrite();
 			callbackContext.success();
 		} catch (IOException e) {
@@ -104,48 +96,14 @@ public class SocketPlugin extends CordovaPlugin {
 	}
 	
 	private void close(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-		String socketKey = args.getString(0);
-		
-		SocketAdapter socket = this.getSocketAdapter(socketKey);
-		
 		try {
+			String socketKey = args.getString(0);
+			SocketAdapter socket = this.getSocketAdapter(socketKey);
 			socket.close();
 			callbackContext.success();
 		} catch (IOException e) {
 			callbackContext.error(e.toString());
 		}
-	}
-	
-	private void setOptions(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-		
-		String socketKey = args.getString(0);
-		JSONObject optionsJSON = args.getJSONObject(1);
-		
-		SocketAdapter socket = this.getSocketAdapter(socketKey);
-		
-		SocketAdapterOptions options = new SocketAdapterOptions();
-		options.setKeepAlive(getBooleanPropertyFromJSON(optionsJSON, "keepAlive"));
-		options.setOobInline(getBooleanPropertyFromJSON(optionsJSON, "oobInline"));
-		options.setReceiveBufferSize(getIntegerPropertyFromJSON(optionsJSON, "receiveBufferSize"));
-		options.setSendBufferSize(getIntegerPropertyFromJSON(optionsJSON, "sendBufferSize"));
-		options.setSoLinger(getIntegerPropertyFromJSON(optionsJSON, "soLinger"));
-		options.setSoTimeout(getIntegerPropertyFromJSON(optionsJSON, "soTimeout"));
-		options.setTrafficClass(getIntegerPropertyFromJSON(optionsJSON, "trafficClass"));
-		
-		try {
-			socket.close();
-			callbackContext.success();
-		} catch (IOException e) {
-			callbackContext.error(e.toString());
-		}
-	}
-	
-	private Boolean getBooleanPropertyFromJSON(JSONObject jsonObject, String propertyName) throws JSONException {
-		return jsonObject.has(propertyName) ? jsonObject.getBoolean(propertyName) : null;
-	}
-	
-	private Integer getIntegerPropertyFromJSON(JSONObject jsonObject, String propertyName) throws JSONException {
-		return jsonObject.has(propertyName) ? jsonObject.getInt(propertyName) : null;
 	}
 	
 	private SocketAdapter getSocketAdapter(String socketKey) {

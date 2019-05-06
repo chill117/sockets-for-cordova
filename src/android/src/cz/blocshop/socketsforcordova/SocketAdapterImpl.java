@@ -47,14 +47,17 @@ public class SocketAdapterImpl implements SocketAdapter {
     }
 
     @Override
-    public void open(final String host, final int port) {
+    public void open(final String host, final int port, final int timeout) {
         this.executor.submit(new Runnable() {
             @Override
             public void run() {
                 try {
-					socket.connect(new InetSocketAddress(host, port));
-					invokeOpenEventHandler();
-					submitReadTask();
+                    socket.connect(new InetSocketAddress(host, port), timeout);
+                    invokeOpenEventHandler();
+                    submitReadTask();
+                } catch (SocketException e) {
+                    Logging.Error(SocketAdapterImpl.class.getName(), "Error during connecting of socket", e.getCause());
+                    invokeOpenErrorEventHandler(e.getMessage());
 				} catch (IOException e) {
 					Logging.Error(SocketAdapterImpl.class.getName(), "Error during connecting of socket", e.getCause());
 					invokeOpenErrorEventHandler(e.getMessage());
@@ -77,31 +80,6 @@ public class SocketAdapterImpl implements SocketAdapter {
     public void close() throws IOException {
     	this.invokeCloseEventHandler(false);
     	this.socket.close();
-    }
-
-    @Override
-    public void setOptions(SocketAdapterOptions options) throws SocketException {
-        if (options.getKeepAlive() != null) {
-            this.socket.setKeepAlive(options.getKeepAlive());
-        }
-        if (options.getOobInline() != null) {
-            this.socket.setOOBInline(options.getOobInline());
-        }
-        if (options.getSoLinger() != null) {
-            this.socket.setSoLinger(true, options.getSoLinger());
-        }
-        if (options.getSoTimeout() != null) {
-            this.socket.setSoTimeout(options.getSoTimeout());
-        }
-        if (options.getReceiveBufferSize() != null) {
-            this.socket.setReceiveBufferSize(options.getReceiveBufferSize());
-        }
-        if (options.getSendBufferSize() != null) {
-            this.socket.setSendBufferSize(options.getSendBufferSize());
-        }
-        if (options.getTrafficClass() != null) {
-            this.socket.setTrafficClass(options.getTrafficClass());
-        }
     }
     
 	@Override
