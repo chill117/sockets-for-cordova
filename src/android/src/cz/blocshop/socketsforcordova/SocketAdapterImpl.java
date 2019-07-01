@@ -18,9 +18,11 @@
 package cz.blocshop.socketsforcordova;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -52,9 +54,13 @@ public class SocketAdapterImpl implements SocketAdapter {
             @Override
             public void run() {
                 try {
-                    socket.connect(new InetSocketAddress(host, port), timeout);
+                    InetAddress ipAddress = InetAddress.getByName(host).getHostAddress();
+                    socket.connect(new InetSocketAddress(ipAddress, port), timeout);
                     invokeOpenEventHandler();
                     submitReadTask();
+                } catch (UnknownHostException e) {
+                    Logging.Error(SocketAdapterImpl.class.getName(), "Error during connecting of socket", e.getCause());
+                    invokeOpenErrorEventHandler(e.getMessage());
                 } catch (SocketException e) {
                     Logging.Error(SocketAdapterImpl.class.getName(), "Error during connecting of socket", e.getCause());
                     invokeOpenErrorEventHandler(e.getMessage());
