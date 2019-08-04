@@ -54,7 +54,7 @@ public class SocketAdapterImpl implements SocketAdapter {
             @Override
             public void run() {
                 try {
-                    InetAddress ipAddress = InetAddress.getByName(host).getHostAddress();
+                    String ipAddress = InetAddress.getByName(host).getHostAddress();
                     socket.connect(new InetSocketAddress(ipAddress, port), timeout);
                     invokeOpenEventHandler();
                     submitReadTask();
